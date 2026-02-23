@@ -2,48 +2,65 @@ const btn = document.getElementById("btn");
 const inputText = document.querySelector("input[type='text']")
 const unordered = document.getElementById("unordered")
 
+function createElement(text, date){
+    const li = document.createElement("li")
+    li.style.color="red";
+    li.innerHTML=`
+    <span>${text}</span>
+    <span>${date}</span>
+    <button>Edit</button>
+    <button>Delete</button>
+    `
+    return li
+}
 
-btn.addEventListener("click", (e)=>{
-    e.preventDefault()
-   const textValue = inputText.value;
-   const date = new Date()
-   const li = document.createElement("li")
-   if(textValue===""){
-    alert("please input the text")
-    return
-   }
-//   onclick="deleteTask(this)
- li.innerHTML= `
- <span>${textValue}</span>
- <span>${date}</span>
- <button>Edit</button>
- <button">Delete</button>
- `
- unordered.appendChild(li)
- li.style.color="red"
 
- inputText.value=""
+btn.addEventListener("click",(e)=>{
+    e.preventDefault();
+    const textValue = inputText.value;
+    if(textValue === "") return alert("Please input text")
+        const date = new Date().toLocaleDateString();
+    const li = createElement(textValue, date)
+    unordered.appendChild(li)
+inputText.value=""
+saveLocal()
 })
 
-// event delegation
+function saveLocal(){
+    const tasks = [];
+    document.querySelectorAll("#unordered li span:first-child").forEach((span)=>{
+        tasks.push(span.textContent)
+    })
+    localStorage.setItem("todoList", JSON.stringify(tasks))
+}
+
 unordered.addEventListener("click", (e)=>{
-const clickedElement = e.target;
-const createInput = document.createElement("input")
-if(clickedElement.innerText==="Delete"){
-    clickedElement.parentElement.remove()
-}
-else if(clickedElement.innerText==="Edit"){
-    const listItem = clickedElement.parentElement;
-    const oldTask = listItem.querySelector("span").innerText;
-    const newTask = prompt("Edit your task: ", oldTask)
-  if(newTask !== null && newTask.trim()!==""){
-    listItem.querySelector("span").innerText = newTask
-  }
-}
+    const clickElement = e.target;
+    if(clickElement.innerText==="Delete"){
+        clickElement.parentElement.remove()
+        saveLocal()
+    }
+    else if(clickElement.innerText==="Edit"){
+        const list = clickElement.parentElement
+        const oldTask = list.querySelector("span").innerText;
+        const newTask = prompt("Updated task: " , oldTask)
+        if(newTask !== null && newTask.trim() !== ""){
+            list.querySelector("span").innerText =newTask
+            saveLocal()
+        }
+
+  
+    }
 })
 
 
-// onclick listener
-// function deleteTask(button){
-// button.parentElement.remove()
-// }
+
+
+window.onload= ()=>{
+    const savedTasks = JSON.parse(localStorage.getItem("todoList")) || [];
+    savedTasks.forEach((taskText)=>{
+        const date = new Date().toLocaleDateString();
+        const li = createElement(taskText, date)
+        unordered.appendChild(li)
+    })
+}
