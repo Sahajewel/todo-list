@@ -33,7 +33,12 @@ if(clickedElement.innerText==="Delete"){
     clickedElement.parentElement.remove()
 }
 else if(clickedElement.innerText==="Edit"){
-   alert(inputText.value)
+    const listItem = clickedElement.parentElement;
+    const oldTask = listItem.querySelector("span").innerText;
+    const newTask = prompt("Edit your task: ", oldTask)
+  if(newTask !== null && newTask.trim()!==""){
+    listItem.querySelector("span").innerText = newTask
+  }
 }
 })
 
